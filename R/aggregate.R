@@ -48,24 +48,24 @@ aggregatets = function (ts, FUN = "previoustick", on = "minutes", k = 1, weights
             secs = k
         }
         a = .index(ts2) + (secs - .index(ts2)%%secs)
-        ts3 = .xts(ts2, a,tz="GMT")
+        ts3 = .xts(ts2, a,tzone="GMT")
     }
     if (on == "hours") {
         secs = 3600
         a = .index(ts2) + (secs - .index(ts2)%%secs)
-        ts3 = .xts(ts2, a,tz="GMT")
+        ts3 = .xts(ts2, a,tzone="GMT")
     }
     if (on == "days") {
         secs = 24 * 3600
         a = .index(ts2) + (secs - .index(ts2)%%secs) - (24 * 
             3600)
-        ts3 = .xts(ts2, a,tz="GMT")
+        ts3 = .xts(ts2, a,tzone="GMT")
     }
     if (on == "weeks") {
         secs = 24 * 3600 * 7
         a = (.index(ts2) + (secs - (.index(ts2) + (3L * 86400L))%%secs)) - 
             (24 * 3600)
-        ts3 = .xts(ts2, a,tz="GMT")
+        ts3 = .xts(ts2, a,tzone="GMT")
     }
 
     if (!dropna) {
@@ -80,7 +80,7 @@ aggregatets = function (ts, FUN = "previoustick", on = "minutes", k = 1, weights
                 tby = "h"
             }
             by = paste(k, tby, sep = " ")
-            allindex = as.timeDate(seq(start(ts3), end(ts3), 
+            allindex = as.timeDate(base:::seq(start(ts3), end(ts3), 
                 by = by))
             xx = xts(rep("1", length(allindex)), order.by = allindex)
             ts3 = merge(ts3, xx)[, (1:dim(ts)[2])]
@@ -98,7 +98,7 @@ aggregatets = function (ts, FUN = "previoustick", on = "minutes", k = 1, weights
     
     FUN = match.fun(FUN);
     
-    g = seq(start(ts), end(ts), by = tby);
+    g = base:::seq(start(ts), end(ts), by = tby);
     rawg = as.numeric(as.POSIXct(g,tz="GMT"));
     newg = rawg + (secs - rawg%%secs);
     g = as.timeDate(as.POSIXct(newg,origin="1970-01-01",tz="GMT"));

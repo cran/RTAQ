@@ -31,8 +31,8 @@ return(data);
 ############################
 convert = function(from,to,datasource,datadestination,trades=TRUE,quotes=TRUE,ticker,dir=FALSE,extention="txt",header=FALSE,tradecolnames=NULL,quotecolnames=NULL,format="%Y%M%D %H:%M:%S"){
   dates = timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT")
-  dates = dates[isBizday(dates, holidays = holidayNYSE(2004:2010))];
-  missingt=missingq=matrix(ncol=2,nrow=0);
+  dates = dates[isBizday(dates, holidays = holidayNYSE(1950:2030))];
+  missingt = missingq = matrix(ncol=2,nrow=0);
 
   if(dir)	{
   dir.create(datadestination);
@@ -50,6 +50,7 @@ convert = function(from,to,datasource,datadestination,trades=TRUE,quotes=TRUE,ti
   }
 }
 
+
 convert_trades = function (datasource, datadestination, ticker, extention = "txt", 
     header = FALSE, tradecolnames = NULL, format = "%Y%M%D %H:%M:%S") 
 {  
@@ -57,7 +58,7 @@ convert_trades = function (datasource, datadestination, ticker, extention = "txt
    
     suppressWarnings(dir.create(datadestination));
     suppressWarnings(dir.create(datasource));
-    
+
     setwd(datasource)
     adjtime = function(z) {
         zz = unlist(strsplit(z, ":"))
@@ -70,8 +71,9 @@ convert_trades = function (datasource, datadestination, ticker, extention = "txt
     for (i in 1:length(ticker)) {
         tfile_name = paste(datasource, "/", ticker[i], "_trades", 
             sep = "")
-        tdata = try(readdata(path = tfile_name, extention = extention, 
+        tdata = try(RTAQ:::readdata(path = tfile_name, extention = extention, 
             header = header, dims = 9), silent = TRUE)
+
         error = dim(tdata)[1] == 0
         if (error) {
             print(paste("no trades for stock", ticker[i]))
@@ -95,7 +97,8 @@ convert_trades = function (datasource, datadestination, ticker, extention = "txt
             oldtime = as.matrix(as.vector(tdata$TIME))
             newtime = apply(oldtime, 1, adjtime)
             tdata$TIME = newtime
-            rm(oldtime, newtime)
+            rm(oldtime, newtime);
+
             tdobject = timeDate:::timeDate(paste(as.vector(tdata$DATE), 
                 as.vector(tdata$TIME)), format = format, FinCenter = "GMT", 
                 zone = "GMT")
@@ -152,6 +155,9 @@ convert_quotes = function (datasource, datadestination, ticker, extention = "txt
             newtime = apply(oldtime, 1, adjtime)
             qdata$TIME = newtime
             rm(oldtime, newtime)
+
+#            if(year == 1993){qdata = qdata[sort(qdata[,4], index.return = TRUE)$ix,]}
+
             test = paste(as.vector(qdata$DATE), as.vector(qdata$TIME))
             tdobject = timeDate:::timeDate(test, format = format, FinCenter = "GMT", 
                 zone = "GMT")
